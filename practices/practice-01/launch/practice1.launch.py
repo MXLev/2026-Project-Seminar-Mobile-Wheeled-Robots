@@ -3,14 +3,14 @@ from launch.actions import EmitEvent, LogInfo, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
 from launch_ros.actions import Node
-from practice1_turtlesim.digits import digit_path
+from practice1_turtlesim.digits_all import digit_path
 
 DIGIT_WIDTH = 3.0
 DIGIT_HEIGHT = 6.0
 BASE_Y = 2.5
 DRAWERS = [
-    {'node_name': 'drawer_left', 'turtle_name': 'turtle_left', 'digit': 1, 'origin_x': 0.25},
-    {'node_name': 'drawer_right', 'turtle_name': 'turtle_right', 'digit': 3, 'origin_x': 4.75},
+    {'node_name': 'drawer_left', 'turtle_name': 'turtle_left', 'digit': 9, 'origin_x': 0.25},
+    {'node_name': 'drawer_right', 'turtle_name': 'turtle_right', 'digit': 9, 'origin_x': 4.75},
 ]
 
 

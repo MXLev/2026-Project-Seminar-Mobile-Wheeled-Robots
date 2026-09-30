@@ -1,13 +1,104 @@
+"""Точки цифр 0-9 для рисования в turtlesim и раскладка числа по окну.
 
-# Only the digits required for variant 13 are described; add a new entry to draw another digit.
-DIGIT_PATHS = {
-    1: [(1.0, 0.0), (1.0, 1.0)],
-    3: [(0.0, 1.0), (1.0, 1.0), (1.0, 0.5), (0.0, 0.5), (1.0, 0.5), (1.0, 0.0), (0.0, 0.0)],
+Каждая цифра задана одной непрерывной ломаной в единичном квадрате:
+(0, 0) - левый нижний угол цифры, (1, 1) - правый верхний.
+Ось y направлена вверх, как в turtlesim.
+
+Почему одна ломаная: черепаха рисует, пока едет, а перо мы не поднимаем.
+У цифр 3 и 4 часть отрезков проходится дважды. Задание это допускает.
+Соседние точки никогда не совпадают, то есть отрезков нулевой длины нет.
+"""
+
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+
+Point = Tuple[float, float]
+
+DIGIT_POLYLINES: Dict[int, List[Point]] = {
+    # прямоугольник: верх, правая сторона, низ, левая сторона
+    0: [(0, 1), (1, 1), (1, 0), (0, 0), (0, 1)],
+    # вертикальная черта справа, как на семисегментном индикаторе
+    1: [(1, 1), (1, 0)],
+    # верх, правая верхняя сторона, середина, левая нижняя сторона, низ
+    2: [(0, 1), (1, 1), (1, 0.5), (0, 0.5), (0, 0), (1, 0)],
+    # как 2, но без левой стороны: середина проходится туда и обратно
+    3: [(0, 1), (1, 1), (1, 0.5), (0, 0.5), (1, 0.5), (1, 0), (0, 0)],
+    # левая верхняя сторона, середина, затем вся правая сторона сверху вниз
+    4: [(0, 1), (0, 0.5), (1, 0.5), (1, 1), (1, 0)],
+    # верх справа налево, левая верхняя сторона, середина, правая нижняя сторона, низ
+    5: [(1, 1), (0, 1), (0, 0.5), (1, 0.5), (1, 0), (0, 0)],
+    # верх справа налево, вся левая сторона, низ, правая нижняя сторона, середина
+    6: [(1, 1), (0, 1), (0, 0), (1, 0), (1, 0.5), (0, 0.5)],
+    # верх и правая сторона
+    7: [(0, 1), (1, 1), (1, 0)],
+    # замкнутый прямоугольник, затем средняя перекладина
+    8: [(0, 0.5), (0, 1), (1, 1), (1, 0), (0, 0), (0, 0.5), (1, 0.5)],
+    # середина справа налево, левая верхняя сторона, верх, вся правая сторона, низ
+    9: [(1, 0.5), (0, 0.5), (0, 1), (1, 1), (1, 0), (0, 0)],
 }
 
 
-def digit_path(digit, origin_x, origin_y, width, height):
-    if digit not in DIGIT_PATHS:
-        raise ValueError(
-            f'Digit {digit} is not supported, available digits: {sorted(DIGIT_PATHS)}')
-    return [(origin_x + u * width, origin_y + v * height) for u, v in DIGIT_PATHS[digit]]
+def digit_path(
+    digit: int, origin_x: float, origin_y: float, width: float, height: float
+) -> List[Point]:
+    """Точки цифры в координатах turtlesim.
+
+    origin_x, origin_y - левый нижний угол цифры, width и height - её размеры.
+    """
+    return [
+        (origin_x + u * width, origin_y + v * height)
+        for u, v in DIGIT_POLYLINES[digit]
+    ]
+
+
+# ---------------------------------------------------------------------------
+# Раскладка числа из нескольких цифр по окну turtlesim
+# ---------------------------------------------------------------------------
+
+WINDOW = 11.0889  # сторона окна turtlesim в единицах
+MARGIN = 0.5  # отступ от края окна, чтобы линии не упирались в границу
+MAX_DIGIT_WIDTH = 3.0  # цифры из 1-2 знаков не растягиваем шире этого
+MAX_DIGIT_HEIGHT = 6.0
+ASPECT = 2.5  # высота цифры / ширина цифры
+GAP_RATIO = 0.33  # зазор между цифрами в долях ширины цифры
+MAX_DIGITS = 8  # при большем числе цифр они становятся слишком мелкими
+
+
+@dataclass(frozen=True)
+class DigitCell:
+    """Где и каким размером рисуется одна цифра числа."""
+
+    digit: int
+    origin_x: float
+    origin_y: float
+    width: float
+    height: float
+
+
+def layout_number(number: str) -> List[DigitCell]:
+    """Раскладывает число по окну: цифры одного размера, ряд по центру окна.
+
+    number - строка из цифр, например "8642" или "07". Строка, а не int,
+    чтобы сохранить ведущие нули. Размер цифры уменьшается с ростом их числа,
+    для 1-2 цифр остаётся максимальным (3 x 6).
+    """
+    if not (number.isascii() and number.isdigit()):
+        raise ValueError(f"number должен состоять только из цифр 0-9, получено {number!r}")
+    count = len(number)
+    if count > MAX_DIGITS:
+        raise ValueError(f"не больше {MAX_DIGITS} цифр, получено {count}")
+
+    usable = WINDOW - 2 * MARGIN
+    # count цифр и (count - 1) зазоров должны уместиться в usable
+    width = min(MAX_DIGIT_WIDTH, usable / (count + (count - 1) * GAP_RATIO))
+    height = min(MAX_DIGIT_HEIGHT, ASPECT * width)
+    gap = GAP_RATIO * width
+
+    total_width = count * width + (count - 1) * gap
+    start_x = (WINDOW - total_width) / 2  # ряд по центру по горизонтали
+    origin_y = (WINDOW - height) / 2  # и по вертикали
+
+    return [
+        DigitCell(int(ch), start_x + i * (width + gap), origin_y, width, height)
+        for i, ch in enumerate(number)
+    ]
