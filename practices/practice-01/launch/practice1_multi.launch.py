@@ -1,10 +1,12 @@
-"""Launch-файл: рисует число из любого количества цифр (до 8) в turtlesim.
+"""Launch-файл: рисует надпись из цифр и латинских букв (до 8 символов) в turtlesim.
 
 Запуск:
-    ros2 launch practice1_turtlesim practice1_multi.launch.py number:=8642
+    ros2 launch practice1_turtlesim practice1_multi.launch.py text:=8642
+    ros2 launch practice1_turtlesim practice1_multi.launch.py text:="HELLO"
 
-Без аргумента рисуется 13. Для каждой цифры создаётся своя черепаха
-(turtle_0, turtle_1, ...) и свой экземпляр узла DigitDrawer (drawer_0, ...).
+Без аргумента рисуется 13. Старый аргумент number:=... тоже работает.
+Для каждого символа создаётся своя черепаха (turtle_0, turtle_1, ...) и свой
+экземпляр узла DigitDrawer (drawer_0, ...). Пробел ничего не рисует.
 """
 
 from launch import LaunchDescription
@@ -20,7 +22,7 @@ from launch.event_handlers import OnProcessStart
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-from practice1_turtlesim.digits import digit_path, layout_number
+from practice1_turtlesim.digits import digit_path, layout_text
 
 PACKAGE = "practice1_turtlesim"
 # Имя исполняемого файла управляющего узла из entry_points в setup.py.
@@ -37,8 +39,11 @@ def _service_call(service, srv_type, request):
 
 
 def _setup(context, *args, **kwargs):
-    number = LaunchConfiguration("number").perform(context)
-    cells = layout_number(number)  # бросит ValueError, если строка не подходит
+    # number - прежнее имя аргумента, оставлено для совместимости
+    text = LaunchConfiguration("number").perform(context) or LaunchConfiguration(
+        "text"
+    ).perform(context)
+    cells = layout_text(text)  # бросит ValueError, если строка не подходит
 
     turtlesim = Node(
         package="turtlesim", executable="turtlesim_node", name="turtlesim"
@@ -50,13 +55,15 @@ def _setup(context, *args, **kwargs):
     spawn_calls = []
     drawers = []
     for i, cell in enumerate(cells):
+        if cell.symbol == " ":
+            continue  # пробел: место занято, рисовать нечего
         turtle_name = f"turtle_{i}"
 
-        # Черепаху создаём ровно в первой точке её цифры. Перо у новой черепахи
+        # Черепаху создаём ровно в первой точке её символа. Перо у новой черепахи
         # опущено, и иначе она нарисовала бы лишнюю линию от места появления
-        # до начала цифры.
+        # до начала символа.
         start_x, start_y = digit_path(
-            cell.digit, cell.origin_x, cell.origin_y, cell.width, cell.height
+            cell.code, cell.origin_x, cell.origin_y, cell.width, cell.height
         )[0]
         spawn_calls.append(
             _service_call(
@@ -74,7 +81,8 @@ def _setup(context, *args, **kwargs):
                 parameters=[
                     {
                         "turtle_name": turtle_name,
-                        "digit": cell.digit,
+                        # код символа: 0-9 цифры, 10-35 буквы A-Z (целое число)
+                        "digit": cell.code,
                         "origin_x": cell.origin_x,
                         "origin_y": cell.origin_y,
                         "width": cell.width,
@@ -86,7 +94,7 @@ def _setup(context, *args, **kwargs):
         )
 
     return [
-        LogInfo(msg=f"Рисуем число {number}: {len(cells)} цифр, по черепахе на цифру"),
+        LogInfo(msg=f"Рисуем {text.upper()!r}: {len(drawers)} символов, по черепахе на символ"),
         turtlesim,
         RegisterEventHandler(
             OnProcessStart(
@@ -107,9 +115,14 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                "number",
+                "text",
                 default_value="13",
-                description="Число для рисования: строка из цифр 0-9, не больше 8 цифр",
+                description="Что рисовать: цифры, латинские буквы и пробелы, не больше 8 символов",
+            ),
+            DeclareLaunchArgument(
+                "number",
+                default_value="",
+                description="Прежнее имя аргумента text, если задан - используется вместо него",
             ),
             OpaqueFunction(function=_setup),
         ]
