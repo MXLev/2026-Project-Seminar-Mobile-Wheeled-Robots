@@ -1,5 +1,3 @@
-"""Helper node that prepares the turtlesim scene: kills the default turtle and spawns new ones."""
-
 import sys
 
 import rclpy
@@ -8,8 +6,6 @@ from turtlesim.srv import Kill, Spawn
 
 
 class SceneSetup(Node):
-    """Call the /kill and /spawn services of turtlesim once."""
-
     def __init__(self):
         super().__init__('scene_setup')
 
@@ -23,7 +19,6 @@ class SceneSetup(Node):
         self.spawn_client = self.create_client(Spawn, '/spawn')
 
     def call(self, client, service_name, request):
-        """Wait for the service, call it and return the response (None if interrupted)."""
         while not client.wait_for_service(timeout_sec=1.0):
             if not rclpy.ok():
                 return None
@@ -33,7 +28,6 @@ class SceneSetup(Node):
         return future.result()
 
     def run(self):
-        """Kill the default turtle and spawn the new ones; return True on success."""
         kill_name = self.get_parameter('kill_name').value
         names = list(self.get_parameter('turtle_names').value)
         xs = list(self.get_parameter('xs').value)
@@ -55,7 +49,6 @@ class SceneSetup(Node):
 
 
 def main(args=None):
-    """Prepare the scene and exit with status 0 on success, 1 otherwise."""
     rclpy.init(args=args)
     node = SceneSetup()
     success = node.run()

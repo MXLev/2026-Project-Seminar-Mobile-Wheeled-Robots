@@ -1,5 +1,3 @@
-"""Launch turtlesim and two digit drawers that paint the number 13 (variant 13)."""
-
 from launch import LaunchDescription
 from launch.actions import EmitEvent, LogInfo, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
@@ -7,9 +5,6 @@ from launch.events import Shutdown
 from launch_ros.actions import Node
 from practice1_turtlesim.digits import digit_path
 
-# The turtlesim window is 11 x 11 units. The number is split into the digits '1' and '3',
-# every digit is drawn by its own turtle inside a cell of DIGIT_WIDTH x DIGIT_HEIGHT units
-# whose lower-left corner is (origin_x, BASE_Y).
 DIGIT_WIDTH = 3.0
 DIGIT_HEIGHT = 6.0
 BASE_Y = 2.5
@@ -20,8 +15,6 @@ DRAWERS = [
 
 
 def generate_launch_description():
-    # Every turtle is spawned exactly at the first vertex of its digit,
-    # so it can start drawing immediately without drawing an extra line.
     start_points = [
         digit_path(d['digit'], d['origin_x'], BASE_Y, DIGIT_WIDTH, DIGIT_HEIGHT)[0]
         for d in DRAWERS
@@ -34,7 +27,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Kills the default turtle1 via /kill and spawns the new turtles via /spawn.
     scene_setup = Node(
         package='practice1_turtlesim',
         executable='scene_setup',
@@ -49,7 +41,6 @@ def generate_launch_description():
         }],
     )
 
-    # Two instances of the same program with different turtle and digit parameters.
     drawers = [
         Node(
             package='practice1_turtlesim',

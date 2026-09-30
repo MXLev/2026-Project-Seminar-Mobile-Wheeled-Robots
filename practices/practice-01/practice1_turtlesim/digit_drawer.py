@@ -1,5 +1,3 @@
-"""Universal node that draws one digit with one turtlesim turtle."""
-
 import math
 
 from geometry_msgs.msg import Twist
@@ -11,7 +9,6 @@ from turtlesim.msg import Pose
 
 
 def normalize_angle(angle):
-    """Wrap an angle to the range [-pi, pi]."""
     return math.atan2(math.sin(angle), math.cos(angle))
 
 
@@ -126,7 +123,6 @@ class DigitDrawer(Node):
 
 
 def main(args=None):
-    """Run the digit drawer node until it is shut down."""
     rclpy.init(args=args)
     node = DigitDrawer()
     try:
