@@ -1,6 +1,6 @@
 .env.local
 __pycache__/
-
+.idea/
 # LaTex build files
 *.snm
 *.vrb
