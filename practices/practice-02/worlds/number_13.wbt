@@ -1,0 +1,65 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/develop/projects/robots/robotis/turtlebot/protos/TurtleBot3Burger.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/develop/projects/devices/robotis/protos/RobotisLds01.proto"
+EXTERNPROTO "../protos/Digit1.proto"
+EXTERNPROTO "../protos/Digit3.proto"
+
+WorldInfo {
+  info [
+    "Practice 2, variant 13: TurtleBot3 Burger and the number 13 made of two static digits"
+  ]
+  title "Number 13"
+}
+Viewpoint {
+  orientation -0.43231 0.43231 0.79134 1.80272
+  position 0 -6.51 9.68
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+
+# 6 x 6 m floor surrounded by walls
+RectangleArena {
+  translation 0 0 0
+  floorSize 6 6
+  floorTileSize 1 1
+  wallThickness 0.05
+  wallHeight 0.4
+}
+
+# The number 13 in the center of the arena: read along +X, the top of the digits points to +Y
+Digit1 {
+  translation -0.6 0 0
+  name "digit 1"
+}
+Digit3 {
+  translation 0.6 0 0
+  name "digit 3"
+}
+
+# The robot starts on the circle of radius 1.8 m around the center, heading along +X,
+# so a constant command (v = 0.18 m/s, w = 0.1 rad/s) drives it counterclockwise around both digits
+TurtleBot3Burger {
+  translation 0 -1.8 0
+  controller "<extern>"
+  controllerArgs [
+    ""
+  ]
+  extensionSlot [
+    Solid {
+      name "imu_link"
+    }
+    GPS {
+    }
+    InertialUnit {
+      name "inertial_unit"
+    }
+    RobotisLds01 {
+    }
+  ]
+}

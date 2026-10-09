@@ -1,0 +1,99 @@
+#VRML_SIM R2025a utf8
+# Static obstacle in the shape of the digit "3" (seven-segment style).
+# The digit lies in the XY plane: it is read along +X, its top points to +Y.
+# Footprint: 0.8 m (X) x 1.4 m (Y), segment thickness 0.15 m, height 0.3 m.
+# There is no Physics node, so the obstacle is static: the robot can not move it.
+
+PROTO Digit3 [
+  field SFVec3f    translation 0 0 0
+  field SFRotation rotation    0 0 1 0
+  field SFString   name        "digit 3"
+  field SFColor    color       0.5 0.5 0.5
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    children [
+      # right vertical segment
+      Pose {
+        translation 0.325 0 0.15
+        children [
+          Shape {
+            appearance DEF DIGIT_APPEARANCE PBRAppearance {
+              baseColor IS color
+              roughness 1
+              metalness 0
+            }
+            geometry DEF RIGHT Box {
+              size 0.15 1.4 0.3
+            }
+          }
+        ]
+      }
+      # top segment
+      Pose {
+        translation 0 0.625 0.15
+        children [
+          Shape {
+            appearance USE DIGIT_APPEARANCE
+            geometry DEF HORIZONTAL Box {
+              size 0.8 0.15 0.3
+            }
+          }
+        ]
+      }
+      # middle segment
+      Pose {
+        translation 0.1 0 0.15
+        children [
+          Shape {
+            appearance USE DIGIT_APPEARANCE
+            geometry DEF MIDDLE Box {
+              size 0.6 0.15 0.3
+            }
+          }
+        ]
+      }
+      # bottom segment
+      Pose {
+        translation 0 -0.625 0.15
+        children [
+          Shape {
+            appearance USE DIGIT_APPEARANCE
+            geometry USE HORIZONTAL
+          }
+        ]
+      }
+    ]
+    boundingObject Group {
+      children [
+        Pose {
+          translation 0.325 0 0.15
+          children [
+            USE RIGHT
+          ]
+        }
+        Pose {
+          translation 0 0.625 0.15
+          children [
+            USE HORIZONTAL
+          ]
+        }
+        Pose {
+          translation 0.1 0 0.15
+          children [
+            USE MIDDLE
+          ]
+        }
+        Pose {
+          translation 0 -0.625 0.15
+          children [
+            USE HORIZONTAL
+          ]
+        }
+      ]
+    }
+  }
+}
