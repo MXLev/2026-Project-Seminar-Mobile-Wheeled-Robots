@@ -20,7 +20,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='LeoSkuratov',
-    maintainer_email='lsskuratov@edu.hse.ru',
+    maintainer_email='skuratov.lev@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
     extras_require={
