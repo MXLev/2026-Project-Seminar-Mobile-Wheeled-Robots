@@ -18,7 +18,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='LeoSkuratov',
-    maintainer_email='lsskuratov@edu.hse.ru',
+    maintainer_email='skuratov.lev@gmail.com',
     description='Draws the number 13 (variant 13) with two turtles in turtlesim.',
     license='Apache-2.0',
     extras_require={
