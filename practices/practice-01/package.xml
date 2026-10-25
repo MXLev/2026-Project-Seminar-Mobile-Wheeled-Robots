@@ -4,7 +4,7 @@
   <name>practice1_turtlesim</name>
   <version>0.0.0</version>
   <description>Draws the number 13 (variant 13) with two turtles in turtlesim.</description>
-  <maintainer email="skuratov.lev@gmail.com">LeoSkuratov</maintainer>
+  <maintainer email="lsskuratov@edu.hse.ru">LeoSkuratov</maintainer>
   <license>Apache-2.0</license>
 
   <exec_depend>geometry_msgs</exec_depend>
