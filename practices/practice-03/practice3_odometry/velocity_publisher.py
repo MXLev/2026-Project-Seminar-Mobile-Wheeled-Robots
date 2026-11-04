@@ -1,8 +1,11 @@
 """Publish one constant, simulation-stamped command at 10 Hz."""
 
+import signal
+
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rclpy.signals import SignalHandlerOptions
 from geometry_msgs.msg import TwistStamped
 
 
@@ -24,13 +27,28 @@ class VelocityPublisher(Node):
 
 
 def main(args=None):
-    rclpy.init(args=args)
-    node = VelocityPublisher()
+    stopping = False
+
+    def request_stop(_signum, _frame):
+        nonlocal stopping
+        stopping = True
+
+    previous_handlers = {signum: signal.signal(signum, request_stop)
+                         for signum in (signal.SIGINT, signal.SIGTERM)}
+    node = None
     try:
-        rclpy.spin(node)
+        # Defer context shutdown until spin_once returns: a signal must not
+        # invalidate /clock subscriptions in the middle of a native ROS read.
+        rclpy.init(args=args, signal_handler_options=SignalHandlerOptions.NO)
+        node = VelocityPublisher()
+        while rclpy.ok() and not stopping:
+            rclpy.spin_once(node, timeout_sec=0.2)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
-        node.destroy_node()
+        if node is not None:
+            node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
+        for signum, handler in previous_handlers.items():
+            signal.signal(signum, handler)

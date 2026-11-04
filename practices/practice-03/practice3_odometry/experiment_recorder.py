@@ -58,6 +58,7 @@ class ExperimentRecorder(Node):
         self.failed = False
         self.started_wall = time.monotonic()
         self.last_report_second = -1
+        self.startup_tf_error = 'No TF lookup attempted yet'
 
         self.tf_buffer = Buffer(cache_time=Duration(seconds=30), node=self)
         self.tf_listener = TransformListener(self.tf_buffer, self)
@@ -73,7 +74,11 @@ class ExperimentRecorder(Node):
 
     def check_startup(self):
         if self.start_ns is None and time.monotonic() - self.started_wall > 90:
-            self.fail('No synchronized TF and commands within 90 s. Check Webots/controllers; no complete results saved.')
+            self.fail(
+                'No synchronized TF and commands within 90 s; no complete results saved. '
+                f'clock_ns={self.sim_ns}, commands={len(self.commands)}. '
+                f'Last TF error: {self.startup_tf_error}'
+            )
 
     def clock_callback(self, msg):
         current = stamp_ns(msg.clock)
@@ -111,6 +116,25 @@ class ExperimentRecorder(Node):
             raise RuntimeError('TF returned mismatched timestamps')
         return pose_from_transform(gt), pose_from_transform(odom)
 
+    def read_initial_transforms(self, available_ns):
+        first_command_ns = self.commands[0][0]
+        try:
+            gt, odom = self.read_transforms(first_command_ns)
+            return first_command_ns, gt, odom
+        except TransformException:
+            # A late TF publisher/listener may never have the first command's
+            # timestamp (especially in Fast mode). Find a newer common time.
+            latest_gt = self.tf_buffer.lookup_transform('map', 'base_link_gt', Time())
+            latest_odom = self.tf_buffer.lookup_transform('map', 'base_link', Time())
+            initial_ns = min(available_ns, stamp_ns(latest_gt.header.stamp),
+                             stamp_ns(latest_odom.header.stamp))
+            if initial_ns < first_command_ns:
+                raise TransformException('Both TF branches must reach the first command timestamp')
+            # Latest poses can have different stamps. Always re-read BOTH at
+            # the chosen time; never compare their separate latest values.
+            gt, odom = self.read_transforms(initial_ns)
+            return initial_ns, gt, odom
+
     def collect(self):
         if self.finished or self.sim_ns is None or not self.commands:
             return
@@ -118,15 +142,17 @@ class ExperimentRecorder(Node):
         if self.start_ns is None:
             if available_ns < self.commands[0][0] or available_ns <= 0:
                 return
-            initial_ns = self.commands[0][0]
             try:
-                gt, odom = self.read_transforms(initial_ns)
-            except TransformException:
+                initial_ns, gt, odom = self.read_initial_transforms(available_ns)
+            except TransformException as error:
+                self.startup_tf_error = str(error)
                 return
             self.start_ns = self.last_sample_ns = initial_ns
             self.cmd_pose = gt  # The only use of GT in command integration.
             self.append_sample(initial_ns, gt, odom)
             self.get_logger().info(f'Started: noise={self.noise}, duration={self.duration}s, t0={initial_ns * 1e-9:.3f}s')
+            if initial_ns > self.commands[0][0]:
+                self.get_logger().info('Initial TF was unavailable; recording starts at a newer synchronized timestamp.')
 
         end_ns = self.start_ns + self.duration_ns
         next_ns = min(self.last_sample_ns + self.period_ns, end_ns)
