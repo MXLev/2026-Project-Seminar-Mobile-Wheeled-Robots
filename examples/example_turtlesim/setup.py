@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'example_turtlesim'
+package_name = 'practice1_turtlesim'
 
 setup(
     name=package_name,
@@ -19,8 +19,8 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='sadergachev',
-    maintainer_email='sadergachev@todo.todo',
+    maintainer='LeoSkuratov',
+    maintainer_email='lsskuratov@edu.hse.ru',
     description='TODO: Package description',
     license='TODO: License declaration',
     extras_require={
@@ -30,8 +30,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'sin_maker = example_turtlesim.sin_maker:main',
-            'nav2goal = example_turtlesim.nav2goal:main',
+            'num_maker = practice1_turtlesim.num_maker:main',
         ],
     },
 )
