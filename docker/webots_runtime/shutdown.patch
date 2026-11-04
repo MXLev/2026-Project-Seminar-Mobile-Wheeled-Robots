@@ -1,0 +1,256 @@
+--- a/webots_ros2_driver/src/Driver.cpp
++++ b/webots_ros2_driver/src/Driver.cpp
+@@ -34,7 +34,7 @@
+ 
+   rclcpp::InitOptions options{};
+   options.shutdown_on_signal = false;
+-  rclcpp::init(argc, argv, options);
++  rclcpp::init(argc, argv, options, rclcpp::SignalHandlerOptions::None);
+ 
+   std::string robotName(wb_robot_get_name());
+   for (char notAllowedChar : " -.)(")
+@@ -45,26 +45,6 @@
+   std::shared_ptr<webots_ros2_driver::WebotsNode> node =
+     std::make_shared<webots_ros2_driver::WebotsNode>(robotName, nodeOptions);
+   node->init();
+-
+-  // The parent process must be ros2 run. Declaring from launch file is deprecated. Remove with 2024.0.0.
+-  const pid_t parentPid = getppid();
+-  char buffer[4096];
+-  snprintf(buffer, sizeof(buffer), "/proc/%d/cmdline", parentPid);
+-  const int fd = open(buffer, O_RDONLY);
+-  if (fd == -1) {
+-    RCLCPP_ERROR(node->get_logger(), "Failed to open cmdline file.");
+-    return -1;
+-  }
+-  const int size = read(fd, buffer, sizeof(buffer));
+-  close(fd);
+-  for (int i = 0; i < size; i++) {
+-    if (!buffer[i])
+-      buffer[i] = ' ';
+-  }
+-  buffer[size] = '\0';
+-  if (strstr(buffer, "ros2 launch"))
+-    RCLCPP_WARN(node->get_logger(), "\033[33mThe direct declaration of the driver node in the launch file is deprecated. "
+-                                    "Please use the new WebotsController node instead.\033[0m");
+ 
+   RCLCPP_INFO(node->get_logger(), "Controller successfully connected to robot in Webots simulation.");
+   while (true) {
+@@ -80,13 +60,17 @@
+     if (pythonPlugin) {
+       pythonPlugin->stop();  // stop only for python plugins
+       isPython = true;
+-      break;
+     }
+   }
+-  if (!isPython) {
++  const auto logger = node->get_logger();
++  node->mPlugins.clear();
++  node.reset();
++  if (isPython) {
++    webots_ros2_driver::PythonPlugin::finalize();
++  } else {
+     wb_robot_cleanup();
+   }
+-  RCLCPP_INFO(node->get_logger(), "Controller successfully disconnected from robot in Webots simulation.");
++  RCLCPP_INFO(logger, "Controller successfully disconnected from robot in Webots simulation.");
+   rclcpp::shutdown();
+   return 0;
+ }
+--- a/webots_ros2_driver/src/WebotsNode.cpp
++++ b/webots_ros2_driver/src/WebotsNode.cpp
+@@ -13,6 +13,7 @@
+ // limitations under the License.
+ 
+ #include "webots_ros2_driver/WebotsNode.hpp"
++#include "webots_ros2_control/Ros2Control.hpp"
+ 
+ #include <yaml-cpp/yaml.h>
+ #include <fstream>
+@@ -293,6 +294,8 @@
+   }
+ 
+   std::shared_ptr<PluginInterface> WebotsNode::loadPlugin(const std::string &type) {
++    if (type == "webots_ros2_control::Ros2Control")
++      return std::make_shared<webots_ros2_control::Ros2Control>();
+     // First, we assume the plugin is C++
+     try {
+       std::shared_ptr<PluginInterface> plugin(mPluginLoader.createUnmanagedInstance(type));
+@@ -336,7 +339,16 @@
+     parameter.value.string_value = parameterValue;
+     parameter.value.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
+     request->parameters.push_back(parameter);
+-    mClient->async_send_request(request);
++    // Do not construct controller_manager until robot_state_publisher has
++    // replaced its bootstrap URDF and published the real robot description.
++    auto response = mClient->async_send_request(request);
++    if (rclcpp::spin_until_future_complete(shared_from_this(), response, std::chrono::seconds(5)) !=
++        rclcpp::FutureReturnCode::SUCCESS)
++      throw std::runtime_error("robot_state_publisher did not accept robot_description within 5 seconds");
++    const auto reply = response.get();
++    for (const auto &result : reply->results)
++      if (!result.successful)
++        throw std::runtime_error("robot_state_publisher rejected robot_description: " + result.reason);
+   }
+ 
+   void WebotsNode::handleSignals() {
+--- a/webots_ros2_driver/src/PythonPlugin.cpp
++++ b/webots_ros2_driver/src/PythonPlugin.cpp
+@@ -5,24 +5,50 @@
+ namespace webots_ros2_driver {
+   PythonPlugin::PythonPlugin(PyObject *pyPlugin) : mPyPlugin(pyPlugin){};
+ 
++  PythonPlugin::~PythonPlugin() {
++    Py_XDECREF(mPyPlugin);
++  }
++
+   void PythonPlugin::init(webots_ros2_driver::WebotsNode *node, std::unordered_map<std::string, std::string> &parameters) {
+     PyObject *pyParameters = PyDict_New();
+     for (const std::pair<std::string, std::string> &parameter : parameters)
+       PyDict_SetItem(pyParameters, PyUnicode_FromString(parameter.first.c_str()),
+                      PyUnicode_FromString(parameter.second.c_str()));
+ 
+-    PyObject_CallMethod(mPyPlugin, "init", "OO", getPyWebotsNodeInstance(), pyParameters);
++    PyObject *result = PyObject_CallMethod(mPyPlugin, "init", "OO", getPyWebotsNodeInstance(), pyParameters);
++    Py_XDECREF(result);
++    Py_DECREF(pyParameters);
+     PyErr_Print();
++    // Embedded rclpy must not interrupt libController recv or invalidate ROS
++    // while the C++ driver is still stepping. The driver owns process signals.
++    if (PyRun_SimpleString("import rclpy.signals\nrclpy.signals.uninstall_signal_handlers()") != 0)
++      throw std::runtime_error("Cannot restore the embedded controller signal policy");
++    WebotsNode::handleSignals();
+   }
+ 
+   void PythonPlugin::step() {
+-    PyObject_CallMethod(mPyPlugin, "step", "");
++    PyObject *result = PyObject_CallMethod(mPyPlugin, "step", "");
++    Py_XDECREF(result);
+     PyErr_Print();
+   }
+ 
+   void PythonPlugin::stop() {
+-    PyObject_CallMethod(mPyPlugin, "stop", "");
+-    Py_Finalize();
++    // stop() is optional in the upstream Python plugin interface.
++    if (PyObject_HasAttrString(mPyPlugin, "stop")) {
++      PyObject *result = PyObject_CallMethod(mPyPlugin, "stop", "");
++      Py_XDECREF(result);
++      PyErr_Print();
++    }
++  }
++
++  void PythonPlugin::finalize() {
++    // Context cleanup destroys remaining Python ROS nodes, including plugins
++    // without stop(). Finalize only once, after all C++ plugins are released.
++    if (PyRun_SimpleString("import rclpy\nrclpy.try_shutdown()") != 0)
++      throw std::runtime_error("Cannot shut down embedded rclpy");
++    Py_CLEAR(gPyWebotsNode);
++    if (Py_FinalizeEx() < 0)
++      throw std::runtime_error("Cannot finalize the embedded Python interpreter");
+   }
+ 
+   PyObject *PythonPlugin::getPyWebotsNodeInstance() {
+--- a/webots_ros2_driver/include/webots_ros2_driver/PythonPlugin.hpp
++++ b/webots_ros2_driver/include/webots_ros2_driver/PythonPlugin.hpp
+@@ -25,9 +25,11 @@
+ namespace webots_ros2_driver {
+   class PythonPlugin : public PluginInterface {
+   public:
++    ~PythonPlugin();
+     void init(webots_ros2_driver::WebotsNode *node, std::unordered_map<std::string, std::string> &parameters) override;
+     void step() override;
+     void stop();
++    static void finalize();
+ 
+     static std::shared_ptr<PythonPlugin> createFromType(const std::string &type);
+ 
+--- a/webots_ros2_control/src/Ros2Control.cpp
++++ b/webots_ros2_control/src/Ros2Control.cpp
+@@ -37,11 +37,16 @@
+ namespace webots_ros2_control {
+ 
+ #if HARDWARE_INTERFACE_VERSION_MAJOR >= 4 && HARDWARE_INTERFACE_VERSION_MINOR >= 12
+-  class WebotsResourceManager : public hardware_interface::ResourceManager {
++  // Base classes are destroyed in reverse order: hardware objects before their loader.
++  class HardwareLoaderOwner {
++  protected:
++    pluginlib::ClassLoader<Ros2ControlSystemInterface> mHardwareLoader{
++      "webots_ros2_control", "webots_ros2_control::Ros2ControlSystemInterface"};
++  };
++  class WebotsResourceManager : private HardwareLoaderOwner, public hardware_interface::ResourceManager {
+   public:
+     WebotsResourceManager(webots_ros2_driver::WebotsNode *node) :
+       hardware_interface::ResourceManager(node->get_node_clock_interface(), node->get_node_logging_interface()),
+-      mHardwareLoader("webots_ros2_control", "webots_ros2_control::Ros2ControlSystemInterface"),
+       mLogger(node->get_logger().get_child("WebotsResourceManager")) {
+       mNode = node;
+     }
+@@ -78,13 +83,25 @@
+ 
+   private:
+     webots_ros2_driver::WebotsNode *mNode;
+-    pluginlib::ClassLoader<webots_ros2_control::Ros2ControlSystemInterface> mHardwareLoader;
+     rclcpp::Logger mLogger;
+   };
+ #endif
+ 
+   Ros2Control::Ros2Control() {
+     mNode = NULL;
++  }
++
++  Ros2Control::~Ros2Control() {
++    mStopping = true;
++    if (mExecutor)
++      mExecutor->cancel();
++    if (mThreadExecutor.joinable())
++      mThreadExecutor.join();
++    if (mExecutor && mControllerManager)
++      mExecutor->remove_node(mControllerManager);
++    mControllerManager.reset();
++    mExecutor.reset();
++    mHardwareLoader.reset();
+   }
+ 
+   void Ros2Control::step() {
+@@ -182,11 +199,11 @@
+     // Spin
+     mExecutor->add_node(mControllerManager);
+     auto spin = [this]() {
+-      while (rclcpp::ok())
+-        mExecutor->spin_once();
++      while (rclcpp::ok() && !mStopping)
++        mExecutor->spin_once(std::chrono::milliseconds(50));
+     };
+     mThreadExecutor = std::thread(spin);
+   }
+ }  // namespace webots_ros2_control
+ 
+-PLUGINLIB_EXPORT_CLASS(webots_ros2_control::Ros2Control, webots_ros2_driver::PluginInterface)
++
+--- a/webots_ros2_control/include/webots_ros2_control/Ros2Control.hpp
++++ b/webots_ros2_control/include/webots_ros2_control/Ros2Control.hpp
+@@ -16,6 +16,7 @@
+ #define ROS2_CONTROL_HPP
+ 
+ #include <memory>
++#include <atomic>
+ #include <string>
+ #include <thread>
+ #include <vector>
+@@ -34,6 +35,7 @@
+   class Ros2Control : public webots_ros2_driver::PluginInterface {
+   public:
+     Ros2Control();
++    ~Ros2Control();
+     void step() override;
+     void init(webots_ros2_driver::WebotsNode *node, std::unordered_map<std::string, std::string> &parameters) override;
+ 
+@@ -44,6 +46,7 @@
+     int mControlPeriodMs;
+     int mLastControlUpdateMs;
+ 
++    std::atomic<bool> mStopping{false};
+     std::thread mThreadExecutor;
+     rclcpp::executors::MultiThreadedExecutor::SharedPtr mExecutor;
+   };

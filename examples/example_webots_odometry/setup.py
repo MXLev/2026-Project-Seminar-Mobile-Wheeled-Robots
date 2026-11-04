@@ -42,6 +42,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'circle_command = example_webots_odometry.circle_command:main',
         ],
     },
 )

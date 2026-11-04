@@ -1,7 +1,7 @@
 import os
 import math
 from launch.substitutions import LaunchConfiguration
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions.path_join_substitution import PathJoinSubstitution
 from launch import LaunchDescription
 from launch_ros.actions import Node
@@ -102,13 +102,10 @@ def generate_launch_description():
         respawn=True
     )
 
-    velocity_publisher = ExecuteProcess(
-        cmd=[
-            'ros2', 'topic', 'pub', '--use-sim-time',
-            '--rate', '10', '/cmd_vel', 'geometry_msgs/msg/TwistStamped',
-            '{header: {stamp: now, frame_id: base_link}, '
-            'twist: {linear: {x: 0.2}, angular: {z: 0.2}}}',
-        ],
+    velocity_publisher = Node(
+        package='example_webots_odometry',
+        executable='circle_command',
+        parameters=[{'use_sim_time': True, 'linear_velocity': 0.2, 'angular_velocity': 0.2}],
         output='screen',
     )
 

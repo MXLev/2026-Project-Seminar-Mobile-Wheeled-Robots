@@ -59,7 +59,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-joint-state-publisher-gui \
     ros-${ROS_DISTRO}-tf2-tools \
     ros-${ROS_DISTRO}-tf-transformations \
-    ros-${ROS_DISTRO}-foxglove-bridge \ 
+    ros-${ROS_DISTRO}-foxglove-bridge \
     ros-${ROS_DISTRO}-turtlebot3 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -165,3 +165,10 @@ RUN echo 'setw -g mouse on' >> ~/.tmux.conf
 
 
 WORKDIR /home/${USERNAME}/
+
+# Common Webots/ROS shutdown compatibility for every practice and example.
+USER root
+COPY docker/webots_runtime /opt/robotics/webots-runtime
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && python3 /opt/robotics/webots-runtime/build.py
+USER ${USERNAME}
