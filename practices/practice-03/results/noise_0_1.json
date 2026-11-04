@@ -1,0 +1,46 @@
+{
+  "duration": 120.0,
+  "sample_period": 0.05,
+  "sync_delay": 0.2,
+  "encoder_noise": 0.1,
+  "integration": "exact piecewise-constant unicycle",
+  "alignment": "tf2 lookup at identical simulation timestamps",
+  "saved_at_utc": "2026-11-04T16:24:47.971394+00:00",
+  "sample_count": 2401,
+  "start_stamp_ns": 15060000000,
+  "end_stamp_ns": 135060000000,
+  "frame": "map",
+  "initial_gt": {
+    "x": 1.0000000005180112,
+    "y": 1.710812179422927e-09,
+    "yaw": 1.5707963437729202
+  },
+  "commands_used": [
+    [
+      0.2,
+      0.2
+    ]
+  ],
+  "errors": {
+    "odom_position_error": {
+      "rmse": 0.08547217265299699,
+      "max": 0.14781448688104457,
+      "final": 0.13824556351129463
+    },
+    "cmd_position_error": {
+      "rmse": 0.13980258670356138,
+      "max": 0.24168852640308333,
+      "final": 0.24168852640308333
+    },
+    "odom_yaw_error": {
+      "rmse": 0.08612290788779955,
+      "max": 0.19370388187253512,
+      "final": 0.09455503068436166
+    },
+    "cmd_yaw_error": {
+      "rmse": 0.1379112376121924,
+      "max": 0.23251754766193758,
+      "final": 0.23251754766193758
+    }
+  }
+}

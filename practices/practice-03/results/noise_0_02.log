@@ -1,0 +1,138 @@
+[INFO] [launch]: All log files can be found below /home/lskuratov/.ros/log/2026-11-04-16-24-23-174786-lskuratov-vm-2950
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [robot_state_publisher-1]: process started with pid [2953]
+[INFO] [static_transform_publisher-2]: process started with pid [2954]
+[INFO] [static_transform_publisher-3]: process started with pid [2955]
+[INFO] [experiment_recorder-4]: process started with pid [2956]
+[INFO] [webots_tcp_client-5]: process started with pid [2957]
+[INFO] [webots_controller_ground_truth_supervisor-6]: process started with pid [2960]
+[INFO] [webots_controller_TurtleBot3Burger-7]: process started with pid [2965]
+[static_transform_publisher-2] [INFO] [1793809463.222385856] [static_transform_publisher_12Cedrjgll4kNu1o]: Spinning until stopped - publishing transform
+[static_transform_publisher-2] translation: ('1.000000', '0.000000', '0.000000')
+[static_transform_publisher-2] rotation: ('0.000000', '0.000000', '0.707107', '0.707107')
+[static_transform_publisher-2] from 'map' to 'odom'
+[robot_state_publisher-1] [INFO] [1793809463.224447304] [robot_state_publisher]: Robot initialized
+[static_transform_publisher-3] [INFO] [1793809463.230587522] [static_transform_publisher_khI2xDLww3rIGeki]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'base_link' to 'base_footprint'
+[webots_controller_TurtleBot3Burger-7] Cannot connect to Webots instance, retrying for another 50 seconds...
+[webots_controller_ground_truth_supervisor-6] Cannot connect to Webots instance, retrying for another 50 seconds...
+[robot_state_publisher-1] [INFO] [1793809465.484975355] [robot_state_publisher]: Robot initialized
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.497642915] [controller_manager]: Using ROS clock for triggering controller manager cycles.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809465.497713373] [controller_manager]: The resource manager is not yet initialized, will wait for the robot description to initialize it..
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.500788065] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.502042017] [controller_manager]: Received robot description from topic.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.502087267] [controller_manager]: Enforcing command limits is disabled. Command limits from URDF will be ignored.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.505977414] [controller_manager]: Initialize hardware 'WebotsControl' 
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809465.506055622] [controller_manager.hardware_component.system.WebotsControl]: Executor is not available during hardware component initialization for 'WebotsControl'. Skipping node creation!
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506128621] [controller_manager]: Successful initialization of hardware 'WebotsControl'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506284079] [controller_manager]: Activating component 'WebotsControl'.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506306954] [resource_manager]: 'configure' hardware 'WebotsControl' 
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506313954] [resource_manager]: Successful 'configure' of hardware 'WebotsControl'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506332495] [resource_manager]: 'activate' hardware 'WebotsControl' 
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506349954] [resource_manager]: Successful 'activate' of hardware 'WebotsControl'
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809465.506370287] [controller_manager]: Component 'WebotsControl' does not have read or write statistics initialized, skipping registration.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.506374620] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.698776258] [plugin_node_example]:   - properties: {'parameterExample': 'someValue'}
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.698935132] [plugin_node_example]:   - robot name: TurtleBot3Burger
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.699056382] [plugin_node_example]:   - basic timestep: 20
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.699276506] [plugin_node_example]:   - is supervisor? False
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809465.700085293] [TurtleBot3Burger]: [33mThe direct declaration of the driver node in the launch file is deprecated. Please use the new WebotsController node instead.[0m
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.700159209] [TurtleBot3Burger]: Controller successfully connected to robot in Webots simulation.
+[INFO] [spawner-8]: process started with pid [3041]
+[webots_controller_ground_truth_supervisor-6] [WARN] [1793809465.758906158] [ground_truth_supervisor]: [33mThe direct declaration of the driver node in the launch file is deprecated. Please use the new WebotsController node instead.[0m
+[webots_controller_ground_truth_supervisor-6] [INFO] [1793809465.758941241] [ground_truth_supervisor]: Controller successfully connected to robot in Webots simulation.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.941344139] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.941368931] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809465.943401087] [controller_manager]: The use of remapping arguments to the controller_manager node is deprecated. Please use the '--controller-ros-args' argument of the spawner to pass remapping arguments to the controller node.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.943414795] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args -p use_sim_time:=true -p set_robot_state_publisher:=true --params-file /home/lskuratov/practices_ws/install/practice3_odometry/share/practice3_odometry/resource/ros2control.yaml -r /diffdrive_controller/cmd_vel:=/cmd_vel -r /diffdrive_controller/odom:=/odom --param use_sim_time:=true 
+[spawner-8] [INFO] [1793809465.964603520] [spawner_joint_state_broadcaster]: Loaded joint_state_broadcaster
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.967204840] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.967309089] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.973812056] [controller_manager]: Loading controller : 'diffdrive_controller' of type 'diff_drive_controller/DiffDriveController'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.973825931] [controller_manager]: Loading controller 'diffdrive_controller'
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809465.975520089] [controller_manager]: The use of remapping arguments to the controller_manager node is deprecated. Please use the '--controller-ros-args' argument of the spawner to pass remapping arguments to the controller node.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.975532380] [controller_manager]: Controller 'diffdrive_controller' node arguments: --ros-args -p use_sim_time:=true -p set_robot_state_publisher:=true --params-file /home/lskuratov/practices_ws/install/practice3_odometry/share/practice3_odometry/resource/ros2control.yaml -r /diffdrive_controller/cmd_vel:=/cmd_vel -r /diffdrive_controller/odom:=/odom --param use_sim_time:=true 
+[spawner-8] [INFO] [1793809465.986287450] [spawner_joint_state_broadcaster]: Loaded diffdrive_controller
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809465.987084738] [controller_manager]: Configuring controller: 'diffdrive_controller'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809466.002505992] [controller_manager]: Activating controllers: [ joint_state_broadcaster diffdrive_controller ]
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809466.004276483] [controller_manager]: Successfully switched controllers!
+[spawner-8] [INFO] [1793809466.005449102] [spawner_joint_state_broadcaster]: Configured and activated all the parsed controllers list : ['joint_state_broadcaster', 'diffdrive_controller']!
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.012026068] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.064750716] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.117513322] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.169681597] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.223510989] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.274849227] [diffdrive_controller]: Velocity command timed out. Braking.
+[INFO] [spawner-8]: process has finished cleanly [pid 3041]
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.340772640] [diffdrive_controller]: Velocity command timed out. Braking.
+[INFO] [velocity_publisher-9]: process started with pid [3062]
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.400613835] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.458540497] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.522343422] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.575501025] [diffdrive_controller]: Velocity command timed out. Braking.
+[webots_controller_TurtleBot3Burger-7] [WARN] [1793809466.635479428] [diffdrive_controller]: Velocity command timed out. Braking.
+[experiment_recorder-4] [INFO] [1793809466.667835346] [experiment_recorder]: t=0.0s | wheel error=0.000m | command error=0.000m
+[experiment_recorder-4] [INFO] [1793809466.668284552] [experiment_recorder]: Started: noise=0.02, duration=120.0s, t0=16.000s
+[experiment_recorder-4] [INFO] [1793809467.168993042] [experiment_recorder]: t=10.0s | wheel error=0.020m | command error=0.028m
+[experiment_recorder-4] [INFO] [1793809467.679967071] [experiment_recorder]: t=20.0s | wheel error=0.038m | command error=0.060m
+[experiment_recorder-4] [INFO] [1793809468.184143847] [experiment_recorder]: t=30.0s | wheel error=0.041m | command error=0.068m
+[experiment_recorder-4] [INFO] [1793809468.673876663] [experiment_recorder]: t=40.0s | wheel error=0.049m | command error=0.078m
+[experiment_recorder-4] [INFO] [1793809469.210229498] [experiment_recorder]: t=50.0s | wheel error=0.070m | command error=0.113m
+[experiment_recorder-4] [INFO] [1793809469.929427587] [experiment_recorder]: t=60.0s | wheel error=0.075m | command error=0.126m
+[experiment_recorder-4] [INFO] [1793809470.810931546] [experiment_recorder]: t=70.0s | wheel error=0.079m | command error=0.132m
+[experiment_recorder-4] [INFO] [1793809471.577407347] [experiment_recorder]: t=80.0s | wheel error=0.100m | command error=0.166m
+[experiment_recorder-4] [INFO] [1793809472.187678227] [experiment_recorder]: t=90.0s | wheel error=0.111m | command error=0.184m
+[experiment_recorder-4] [INFO] [1793809472.696683203] [experiment_recorder]: t=100.0s | wheel error=0.114m | command error=0.188m
+[experiment_recorder-4] [INFO] [1793809473.207494133] [experiment_recorder]: t=110.0s | wheel error=0.134m | command error=0.218m
+[experiment_recorder-4] [INFO] [1793809473.716874286] [experiment_recorder]: t=120.0s | wheel error=0.144m | command error=0.242m
+[experiment_recorder-4] [INFO] [1793809474.387464736] [experiment_recorder]: EXPERIMENT COMPLETE: 2401 samples; saved /home/lskuratov/practices_ws/src/practice-03/results/noise_0_02.png
+[INFO] [experiment_recorder-4]: process has finished cleanly [pid 2956]
+[INFO] [velocity_publisher-9]: sending signal 'SIGINT' to process[velocity_publisher-9]
+[INFO] [webots_controller_TurtleBot3Burger-7]: sending signal 'SIGINT' to process[webots_controller_TurtleBot3Burger-7]
+[INFO] [webots_controller_ground_truth_supervisor-6]: sending signal 'SIGINT' to process[webots_controller_ground_truth_supervisor-6]
+[INFO] [webots_tcp_client-5]: sending signal 'SIGINT' to process[webots_tcp_client-5]
+[INFO] [static_transform_publisher-3]: sending signal 'SIGINT' to process[static_transform_publisher-3]
+[INFO] [static_transform_publisher-2]: sending signal 'SIGINT' to process[static_transform_publisher-2]
+[INFO] [robot_state_publisher-1]: sending signal 'SIGINT' to process[robot_state_publisher-1]
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.735948858] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[webots_controller_ground_truth_supervisor-6] [INFO] [1793809474.736265940] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[webots_tcp_client-5] Traceback (most recent call last):
+[webots_tcp_client-5]   File "/opt/ros/jazzy/share/webots_ros2_driver/scripts/webots_tcp_client.py", line 82, in <module>
+[webots_tcp_client-5]     data = tcp_socket.recv(1024)
+[webots_tcp_client-5]            ^^^^^^^^^^^^^^^^^^^^^
+[webots_tcp_client-5] KeyboardInterrupt
+[static_transform_publisher-3] [INFO] [1793809474.739745423] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-2] [INFO] [1793809474.740178296] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1793809474.740361961] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [webots_tcp_client-5]: process has died [pid 2957, exit code -2, cmd 'python3 /opt/ros/jazzy/share/webots_ros2_driver/scripts/webots_tcp_client.py --port=1234 --batch --mode=fast tmpi3l2f2rl_world_with_URDF_robot.wbt'].
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.776924990] [TurtleBot3Burger]: Controller successfully disconnected from robot in Webots simulation.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.776977282] [controller_manager]: Shutdown request received....
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777036365] [controller_manager]: Shutting down all controllers in the controller manager.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777047615] [controller_manager]: Deactivating controller 'diffdrive_controller'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777083531] [controller_manager]: Shutting down controller 'diffdrive_controller'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777198072] [controller_manager]: Deactivating controller 'joint_state_broadcaster'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777271489] [controller_manager]: Shutting down controller 'joint_state_broadcaster'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777317655] [resource_manager]: 'deactivate' hardware 'WebotsControl' 
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777325655] [resource_manager]: Successful 'deactivate' of hardware 'WebotsControl'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777328030] [resource_manager]: 'shutdown' hardware 'WebotsControl' 
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777329197] [resource_manager]: Successful 'shutdown' of hardware 'WebotsControl'
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.777342238] [controller_manager]: Shutting down the controller manager.
+[webots_controller_TurtleBot3Burger-7] [ERROR] [1793809474.777464321] [controller_manager.pal_statistics]: Exception in publisher thread: context cannot be slept with because it's invalid!. Aborting!
+[webots_controller_TurtleBot3Burger-7] [ERROR] [1793809474.777525612] [controller_manager.pal_statistics]: Exception in publisher thread: context cannot be slept with because it's invalid!. Aborting!
+[webots_controller_ground_truth_supervisor-6] [INFO] [1793809474.780303849] [ground_truth_supervisor]: Controller successfully disconnected from robot in Webots simulation.
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.800797373] [controller_manager.pal_statistics]: Async messages lost 0
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.800816331] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.801540119] [controller_manager.pal_statistics]: Async messages lost 0
+[webots_controller_TurtleBot3Burger-7] [INFO] [1793809474.801545244] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[webots_controller_TurtleBot3Burger-7] Warning: class_loader.ClassLoader: SEVERE WARNING!!! Attempting to unload library while objects created by this loader exist in the heap! You should delete your objects before attempting to unload the library or destroying the ClassLoader. The library will NOT be unloaded.
+[webots_controller_TurtleBot3Burger-7]          at line 127 in ./src/class_loader.cpp
+[webots_controller_TurtleBot3Burger-7] Warning: class_loader.ClassLoader: SEVERE WARNING!!! Attempting to unload library while objects created by this loader exist in the heap! You should delete your objects before attempting to unload the library or destroying the ClassLoader. The library will NOT be unloaded.
+[webots_controller_TurtleBot3Burger-7]          at line 127 in ./src/class_loader.cpp
+[INFO] [webots_controller_TurtleBot3Burger-7]: process has finished cleanly [pid 2965]
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 2955]
+[INFO] [static_transform_publisher-2]: process has finished cleanly [pid 2954]
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 2953]
+[INFO] [webots_controller_ground_truth_supervisor-6]: process has finished cleanly [pid 2960]
+[INFO] [velocity_publisher-9]: process has finished cleanly [pid 3062]
