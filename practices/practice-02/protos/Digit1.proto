@@ -1,0 +1,85 @@
+#VRML_SIM R2025a utf8
+# Static obstacle in the shape of the digit "1".
+# The digit lies in the XY plane: it is read along +X, its top points to +Y.
+# Footprint: about 0.7 m (X) x 1.4 m (Y), segment thickness 0.15 m, height 0.3 m.
+# There is no Physics node, so the obstacle is static: the robot can not move it.
+
+PROTO Digit1 [
+  field SFVec3f    translation 0 0 0
+  field SFRotation rotation    0 0 1 0
+  field SFString   name        "digit 1"
+  field SFColor    color       0.5 0.5 0.5
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    children [
+      # vertical stem
+      Pose {
+        translation 0.05 0 0.15
+        children [
+          Shape {
+            appearance DEF DIGIT_APPEARANCE PBRAppearance {
+              baseColor IS color
+              roughness 1
+              metalness 0
+            }
+            geometry DEF STEM Box {
+              size 0.15 1.4 0.3
+            }
+          }
+        ]
+      }
+      # flag at the top of the stem
+      Pose {
+        translation -0.13 0.5 0.15
+        rotation 0 0 1 0.7854
+        children [
+          Shape {
+            appearance USE DIGIT_APPEARANCE
+            geometry DEF FLAG Box {
+              size 0.4 0.15 0.3
+            }
+          }
+        ]
+      }
+      # base
+      Pose {
+        translation 0.05 -0.625 0.15
+        children [
+          Shape {
+            appearance USE DIGIT_APPEARANCE
+            geometry DEF BASE Box {
+              size 0.6 0.15 0.3
+            }
+          }
+        ]
+      }
+    ]
+    boundingObject Group {
+      children [
+        Pose {
+          translation 0.05 0 0.15
+          children [
+            USE STEM
+          ]
+        }
+        Pose {
+          translation -0.13 0.5 0.15
+          rotation 0 0 1 0.7854
+          children [
+            USE FLAG
+          ]
+        }
+        Pose {
+          translation 0.05 -0.625 0.15
+          children [
+            USE BASE
+          ]
+        }
+      ]
+    }
+  }
+}
