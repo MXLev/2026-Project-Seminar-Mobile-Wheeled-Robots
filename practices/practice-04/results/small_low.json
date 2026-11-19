@@ -1,0 +1,12 @@
+{
+  "duration": 150.0,
+  "position_threshold": 0.15,
+  "yaw_threshold": 0.15,
+  "hold_time": 5.0,
+  "scenario": "small",
+  "particles": "low",
+  "t0_sim_s": 29.536,
+  "sample_period_s": 0.1,
+  "samples": 1501,
+  "convergence_s": 1.1
+}
